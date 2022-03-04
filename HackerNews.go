@@ -93,13 +93,17 @@ type HNAlgoliaSearchResult struct {
 // 	}
 // }
 
-func (hn HNClient) ClassicsFormatData(results HNAlgoliaSearchResults) (mrkdwnList []string) {
+func (hn HNClient) ClassicsFormatData(results HNAlgoliaSearchResults) (mrkdwnList []string, err error) {
 	var story HNAlgoliaSearchResult
 	for _, story = range results.Hits {
+		var timestamp string
+		if timestamp, err = utilities.ConvertUnixTime(story.Created_at_i, Params.Timezone, Params.TimeFormat); err != nil {
+			return
+		}
 		var text string = fmt.Sprintf(
 			"*<%s|%s>*\n[<%s|hn>] Score: %d, Comments: %d\n@%s [%s]",
 			story.Url, story.Title, fmt.Sprintf("https://news.ycombinator.com/item?id=%s", story.ObjectID), story.Points,
-			story.Num_comments, hn.parseHostname(story.Url), utilities.ConvertUnixTime(story.Created_at_i),
+			story.Num_comments, hn.parseHostname(story.Url), timestamp,
 		)
 		mrkdwnList = append(mrkdwnList, text)
 	}
@@ -243,10 +247,14 @@ func (hn HNClient) formatData(storyTypeInfo string, stories []HNItem, useDivider
 		mbarr = append(mbarr, SC.CreateTextBlock(fmt.Sprintf("*%s*", storyTypeInfo), "mrkdwn", ""))
 	}
 	for _, story = range stories {
+		var timestamp string
+		if timestamp, err = utilities.ConvertUnixTime(story.Time, Params.Timezone, Params.TimeFormat); err != nil {
+			return
+		}
 		var text string = fmt.Sprintf(
 			"*<%s|%s>*\n[<%s|hn>] Score: %d, Comments: %d\n@%s [%s]",
 			story.Url, story.Title, fmt.Sprintf(hn.PageUrlTmplt, story.Id), story.Score,
-			len(story.Kids), hn.parseHostname(story.Url), utilities.ConvertUnixTime(story.Time),
+			len(story.Kids), hn.parseHostname(story.Url), timestamp,
 		)
 		if useDivider {
 			mbarr = append(mbarr, utilities.MessageBlock{Type: "divider"})

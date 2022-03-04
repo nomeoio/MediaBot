@@ -6,6 +6,8 @@ type Parameters struct {
 	TwitterAccessToken       string
 	TwitterAccessTokenSecret string
 	TwitterBearerToken       string
+	Timezone                 string
+	TimeFormat               string
 }
 
 var (

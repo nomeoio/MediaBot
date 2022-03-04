@@ -6,7 +6,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/gofiber/fiber/v2 v2.28.0
 	github.com/mattn/go-sqlite3 v1.14.12
-	github.com/naughtymonsta/utilities v0.0.0-20220303134049-a03327417cb6
+	github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62
 	gorm.io/driver/sqlite v1.3.1
 	gorm.io/gorm v1.23.2
 )
