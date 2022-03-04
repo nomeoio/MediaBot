@@ -1,24 +1,21 @@
 package mediabot
 
 type Parameters struct {
-	AutoRedditLeaseScore          int    `json:"AutoRedditLeaseScore,omitempty"`
-	AutoHNRenewLeastScore         int    `json:"AutoHNRenewLeastScore,omitempty"`
-	AutoTwitterLeastOriginalLikes int    `json:"AutoTwitterLeastOriginalLikes,omitempty"`
-	AutoTwitterLeastRetweetLikes  int    `json:"AutoTwitterLeastRetweetLikes,omitempty"`
-	HNClassicDaysFromDate         int    `json:"HNClassicDaysFromDate,omitempty"`
-	LatestHNClassicDate           string `json:"LatestHNClassicDate,omitempty"`
-	Timezone                      string `json:"Timezone,omitempty"`
-	TimeFormat                    string `json:"TimeFormat,omitempty"`
+	TwitterApiKey            string
+	TwitterApiKeySecret      string
+	TwitterAccessToken       string
+	TwitterAccessTokenSecret string
+	TwitterBearerToken       string
 }
 
 var (
 	tc TwitterClient
 	// sf SlackFormat
 	// dc     DiscordClient
-	xk XKCDClient
-	db Database
-	// Params Parameters
-	hn = HNClient{
+	xk     XKCDClient
+	DB     Database
+	Params Parameters
+	hn     = HNClient{
 		ItemUrlTmplt:    "https://hacker-news.firebaseio.com/v0/item/%s.json",   // "https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty"
 		StoriesUrlTmplt: "https://hacker-news.firebaseio.com/v0/%sstories.json", // for finding top/new/best stories
 		PageUrlTmplt:    "https://news.ycombinator.com/item?id=%d",              // link to the HN page of this story

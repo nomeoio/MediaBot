@@ -32,6 +32,7 @@ func (db *Database) Init(sqliteFile string) {
 	}); err != nil {
 		log.Panicln(err)
 	}
+	db.CreateTable()
 }
 
 func (db Database) CreateTable() {

@@ -2,6 +2,7 @@ package mediabot
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/naughtymonsta/utilities"
@@ -15,11 +16,12 @@ type MediaBot struct{}
 
 func (mBot MediaBot) AutoRetrieveHN(slackWebHookUrlHN string) (err error) {
 	for _, s := range []string{"top", "new", "best"} {
+		log.Printf("retrieving %s hacker news.", s)
 		var mbss []utilities.MessageBlocks
 		if mbss, err = hn.RetrieveNew(s, 200); err != nil {
 			return
 		}
-		// mbss = append(mbss, mbss_...)
+		log.Printf("retrievd %d %s hacker news.", len(mbss), s)
 		for _, mbs := range mbss {
 			if err = SC.SendBlocks(mbs, slackWebHookUrlHN); err != nil { // send the new and not published stories to slack #hacker-news
 				return
@@ -53,15 +55,17 @@ func (mBot MediaBot) AutoRetrieveHN(slackWebHookUrlHN string) (err error) {
 // 	return
 // }
 
-func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOriginalLikes int, slackWebHookUrlTwitter string) (err error) {
+func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOriginalLikes, leastRetweetLikes int, twitterBearerToken, slackWebHookUrlTwitter string) (err error) {
 	// :leastOriginalLikes: if it's retweet, this checks the original tweet's likes
 	var totalTweets int
-	for listName := range tweetList {
+	for listName, listId := range tweetList {
+		log.Println("retrieving list:", listName, "id:", listId)
 		var mbList [][]utilities.MessageBlock
-		mbList, err = tc.RetrieveTweets(listName, 1000, leastOriginalLikes)
+		mbList, err = tc.RetrieveTweets(listId, twitterBearerToken, leastRetweetLikes, leastOriginalLikes)
 		if err != nil {
 			return
 		}
+		log.Println("mbList length:", len(mbList))
 		totalTweets += len(mbList)
 		var i int
 		var mb []utilities.MessageBlock
@@ -82,7 +86,7 @@ func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOrigi
 				return
 			}
 		}
-		if IsTestMode { // if in test mode, only go through 1 loop
+		if IsTestMode { // if in test mode, only go through 1 loop, instead going through all tweet lists
 			break
 		}
 	}
@@ -91,7 +95,7 @@ func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOrigi
 }
 
 func (mBot MediaBot) AutoRetrieveXkcd(slackWebHookUrlCartoons string) (err error) {
-	var item SavedItem = db.UpdateXkcd()
+	var item SavedItem = DB.UpdateXkcd()
 	var mbs utilities.MessageBlocks
 	mbs, err = xk.GetStoryById(item.Id)
 	if err != nil {

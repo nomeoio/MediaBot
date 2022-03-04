@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,7 +16,7 @@ import (
 
 type TwitterClient struct{}
 
-func (tc TwitterClient) LookUpTweets(ids []string) (tweets []Tweet, err error) {
+func (tc TwitterClient) LookUpTweets(ids []string, twitterBearerToken string) (tweets []Tweet, err error) {
 	tweets = make([]Tweet, len(ids))
 	var i int
 	var id string
@@ -27,7 +26,7 @@ func (tc TwitterClient) LookUpTweets(ids []string) (tweets []Tweet, err error) {
 		go func(i int, id string) {
 			defer wg.Done()
 			var tweet Tweet
-			if tweet, err = tc.lookUpTweet(id); err != nil {
+			if tweet, err = tc.lookUpTweet(id, twitterBearerToken); err != nil {
 				return
 			}
 			tweets[i] = tweet
@@ -37,10 +36,10 @@ func (tc TwitterClient) LookUpTweets(ids []string) (tweets []Tweet, err error) {
 	return
 }
 
-func (tc TwitterClient) lookUpTweet(id string) (tweet Tweet, err error) {
+func (tc TwitterClient) lookUpTweet(id, twitterBearerToken string) (tweet Tweet, err error) {
 	var url string = fmt.Sprintf(tweetLoopUpEndpoint, id)
 	var respJson []byte
-	if respJson, err = tc.SendHttpRequest(url, "v1"); err != nil {
+	if respJson, err = tc.SendHttpRequest(url, "v1", twitterBearerToken); err != nil {
 		return
 	}
 	_ = json.Unmarshal(respJson, &tweet)
@@ -48,15 +47,15 @@ func (tc TwitterClient) lookUpTweet(id string) (tweet Tweet, err error) {
 	return
 }
 
-func (tc TwitterClient) LookUpTwitterUsers(ids []string, idType string) (respJson []byte, err error) {
+func (tc TwitterClient) LookUpTwitterUsers(ids []string, idType string, twitterBearerToken string) (respJson []byte, err error) {
 	var idsString string = ids[0]
 	for _, id := range ids[1:] {
 		idsString = idsString + "," + id
 	}
 	if idType == "id" {
-		respJson, err = tc.SendHttpRequest(fmt.Sprintf(usersLookupEndpoint, fmt.Sprintf("?ids=%s", idsString)), "v2")
+		respJson, err = tc.SendHttpRequest(fmt.Sprintf(usersLookupEndpoint, fmt.Sprintf("?ids=%s", idsString)), "v2", twitterBearerToken)
 	} else if idType == "username" {
-		respJson, err = tc.SendHttpRequest(fmt.Sprintf(usersLookupEndpoint, fmt.Sprintf("/by?usernames=%s", idsString)), "v2")
+		respJson, err = tc.SendHttpRequest(fmt.Sprintf(usersLookupEndpoint, fmt.Sprintf("/by?usernames=%s", idsString)), "v2", twitterBearerToken)
 	} else {
 		err = fmt.Errorf("id type: %s is wrong", idType)
 		return
@@ -64,11 +63,12 @@ func (tc TwitterClient) LookUpTwitterUsers(ids []string, idType string) (respJso
 	return
 }
 
-func (tc TwitterClient) SendHttpRequest(url, version string) (body []byte, err error) {
+func (tc TwitterClient) SendHttpRequest(url, version, twitterBearerToken string) (body []byte, err error) {
+	log.Println("url:", url)
 	if version == "v1" {
 		body = tc.oauth1Request(url)
 	} else if version == "v2" {
-		var headers = [][]string{{"Authorization", fmt.Sprintf("Bearer %s", os.Getenv("TwitterBearerToken"))}}
+		var headers = [][]string{{"Authorization", fmt.Sprintf("Bearer %s", twitterBearerToken)}}
 		if body, err = utilities.HttpRequest("GET", nil, url, headers); err != nil {
 			log.Panic(err)
 		}
@@ -77,8 +77,8 @@ func (tc TwitterClient) SendHttpRequest(url, version string) (body []byte, err e
 }
 
 func (tc TwitterClient) oauth1Request(url string) (body []byte) {
-	config := oauth1.NewConfig(os.Getenv("TwitterApiKey"), os.Getenv("TwitterApiKeySecret"))
-	token := oauth1.NewToken(os.Getenv("TwitterAccessToken"), os.Getenv("TwitterAccessTokenSecret"))
+	config := oauth1.NewConfig(Params.TwitterApiKey, Params.TwitterApiKeySecret)
+	token := oauth1.NewToken(Params.TwitterAccessToken, Params.TwitterAccessTokenSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
 	resp, err := httpClient.Get(url)
 	if err != nil {
@@ -93,7 +93,7 @@ func (tc TwitterClient) oauth1Request(url string) (body []byte) {
 	return
 }
 
-func (tc TwitterClient) RetrieveByCommand(cmdTxt string) (mbs utilities.MessageBlocks, err error) { // /twt listname limit
+func (tc TwitterClient) RetrieveByCommand(cmdTxt, twitterBearerToken string) (mbs utilities.MessageBlocks, err error) { // /twt listname limit
 	var leastLikes int
 	var listId, numStr string
 	var fields []string = strings.Fields(cmdTxt)
@@ -101,7 +101,7 @@ func (tc TwitterClient) RetrieveByCommand(cmdTxt string) (mbs utilities.MessageB
 	numStr = fields[1]
 	leastLikes, _ = strconv.Atoi(numStr)
 	var mbList [][]utilities.MessageBlock
-	mbList, err = tc.RetrieveTweets(listId, 1000, leastLikes)
+	mbList, err = tc.RetrieveTweets(listId, twitterBearerToken, 1000, leastLikes)
 	if err != nil {
 		return
 	}
@@ -122,12 +122,13 @@ func (tc TwitterClient) RetrieveByCommand(cmdTxt string) (mbs utilities.MessageB
 	return
 }
 
-func (tc TwitterClient) RetrieveTweets(listId string, leastRetweetLikes int, leastLikes int) (mbList [][]utilities.MessageBlock, err error) {
+func (tc TwitterClient) RetrieveTweets(listId, twitterBearerToken string, leastRetweetLikes, leastLikes int) (mbList [][]utilities.MessageBlock, err error) {
 	// :leastRetweetLikes: the least number of likes the retweet should have
 	var listTweets, qualifiedListTweets []Tweet
-	if listTweets, err = tc.GetListContent(listId); err != nil {
+	if listTweets, err = tc.GetListContent(listId, twitterBearerToken); err != nil {
 		return
 	}
+	log.Println("retrieved", len(listTweets), "tweets.")
 
 	// check if tweets are qualified
 	var listTweet Tweet
@@ -136,7 +137,7 @@ func (tc TwitterClient) RetrieveTweets(listId string, leastRetweetLikes int, lea
 		var retweet *Tweet = listTweet.Retweeted_Status
 		var quoted *Tweet = listTweet.Quoted_Status
 		if listTweet.Favorite_Count >= leastLikes || (retweet != nil && retweet.Favorite_Count >= leastRetweetLikes) || (quoted != nil && quoted.Favorite_Count >= leastRetweetLikes) { // if tweet is qualified
-			if db.QueryRow(listTweet.Id_Str).Platform == "Twitter" { // if exists
+			if DB.QueryRow(listTweet.Id_Str).Platform == "Twitter" { // if exists
 				continue
 			} else {
 				qualifiedSavedItems = append(qualifiedSavedItems, SavedItem{Id: listTweet.Id_Str, Platform: "Twitter"})
@@ -146,7 +147,7 @@ func (tc TwitterClient) RetrieveTweets(listId string, leastRetweetLikes int, lea
 		}
 	}
 	if len(qualifiedSavedItems) > 0 {
-		db.InsertRows(qualifiedSavedItems)
+		DB.InsertRows(qualifiedSavedItems)
 	}
 
 	var mbarr []utilities.MessageBlock
@@ -276,28 +277,28 @@ func (tc TwitterClient) loopMediaList(mediaList []TweetMedia) (mbarr []utilities
 	return
 }
 
-func (tc TwitterClient) GetListContent(listId string) (tweets []Tweet, err error) {
+func (tc TwitterClient) GetListContent(listId, twitterBearerToken string) (tweets []Tweet, err error) {
 	var url string = fmt.Sprintf(listEndpoint, listId)
 	var respJson []byte
-	if respJson, err = tc.SendHttpRequest(url, "v1"); err != nil {
+	if respJson, err = tc.SendHttpRequest(url, "v1", twitterBearerToken); err != nil {
 		return
 	}
 	_ = json.Unmarshal(respJson, &tweets)
 	return
 }
 
-func (tc TwitterClient) GetThread(tweetID, userID string) (err error) {
+func (tc TwitterClient) GetThread(tweetID, userID, twitterBearerToken, slackUrl string) (err error) {
 	var tweets []Tweet
-	if tweets, err = tc.getThreadTweets(tweetID, userID); err != nil {
+	if tweets, err = tc.getThreadTweets(tweetID, userID, twitterBearerToken); err != nil {
 		return
 	}
-	if tc.sendThread(tweets); err != nil {
+	if tc.sendThread(tweets, slackUrl); err != nil {
 		return
 	}
 	return
 }
 
-func (tc TwitterClient) sendThread(threadList []Tweet) (err error) {
+func (tc TwitterClient) sendThread(threadList []Tweet, slackUrl string) (err error) {
 	var mbs utilities.MessageBlocks
 	for _, tweet := range threadList {
 		var mbarr []utilities.MessageBlock
@@ -306,31 +307,31 @@ func (tc TwitterClient) sendThread(threadList []Tweet) (err error) {
 		}
 		mbs.Blocks = append(mbs.Blocks, mbarr...)
 	}
-	if err = SC.SendBlocks(mbs, os.Getenv("SlackWebHookUrlTest")); err != nil {
+	if err = SC.SendBlocks(mbs, slackUrl); err != nil {
 		return
 	}
 	return
 }
 
-func (tc TwitterClient) getThreadTweets(convoID, userID string) (tweets []Tweet, err error) {
+func (tc TwitterClient) getThreadTweets(convoID, userID, twitterBearerToken string) (tweets []Tweet, err error) {
 	var url string = fmt.Sprintf(convoEndpoint, convoID, userID, userID)
 	url = strings.ReplaceAll(url, " ", "%20")
 
 	var respJson []byte
 	var thread Thread
-	if respJson, err = tc.SendHttpRequest(url, "v2"); err != nil {
+	if respJson, err = tc.SendHttpRequest(url, "v2", twitterBearerToken); err != nil {
 		return
 	}
 	if err = json.Unmarshal(respJson, &thread); err != nil {
 		return
 	}
-	if tweets, err = tc.sortThreadTweets(thread); err != nil {
+	if tweets, err = tc.sortThreadTweets(thread, twitterBearerToken); err != nil {
 		return
 	}
 	return
 }
 
-func (tc TwitterClient) sortThreadTweets(thread Thread) (tweets []Tweet, err error) {
+func (tc TwitterClient) sortThreadTweets(thread Thread, twitterBearerToken string) (tweets []Tweet, err error) {
 	var sortedThreadTweets []ThreadTweetInfo
 	var threadTweet, tweet ThreadTweetInfo
 	var threadTweets []ThreadTweetInfo
@@ -370,7 +371,7 @@ func (tc TwitterClient) sortThreadTweets(thread Thread) (tweets []Tweet, err err
 		ids = append(ids, tt.Id)
 	}
 
-	if tweets, err = tc.LookUpTweets(ids); err != nil {
+	if tweets, err = tc.LookUpTweets(ids, twitterBearerToken); err != nil {
 		return
 	}
 	return

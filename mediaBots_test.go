@@ -2,7 +2,6 @@ package mediabot
 
 import (
 	"fmt"
-	"testing"
 	"time"
 )
 
@@ -25,7 +24,7 @@ func StartAll(slackWebHookUrlHN, slackWebHookUrlTwitter, slackWebHookUrlCartoons
 			SC.SendPlainText(fmt.Sprint(time.Now().Format("2006-01-02 15:04:05"), ":", "Auto retrieving new posts... "), logUrl)
 			go mBot.AutoRetrieveHN(slackWebHookUrlHN)
 			// go rc.AutoRetrieveNew()
-			go mBot.AutoRetrieveTwitter(TweetLists, 2000, slackWebHookUrlTwitter)
+			go mBot.AutoRetrieveTwitter(TweetLists, 2000, 1000, Params.TwitterBearerToken, slackWebHookUrlTwitter)
 			if i%12 == 0 { // run every 12 hours
 				go mBot.AutoRetrieveXkcd(slackWebHookUrlCartoons)
 			}
@@ -39,6 +38,26 @@ func StartAll(slackWebHookUrlHN, slackWebHookUrlTwitter, slackWebHookUrlCartoons
 	}
 }
 
-func TestAll(t *testing.T) {
-	mBot.AutoRetrieveHN("https://hooks.slack.com/services/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")
-}
+// func TestAll(t *testing.T) {
+// 	DB.Init("file:./data/ids.db") // creates db file or table if doesn't exist, doesn't do anything if exists.
+// 	// var savedItems []SavedItem = DB.ReturnAllRecords("HackerNews")
+// 	// var savedItems []SavedItem = DB.ReturnAllRecords("Twitter")
+// 	// t.Log(savedItems)
+// 	// for _, savedItem := range savedItems {
+// 	// 	t.Log(savedItem)
+// 	// }
+// 	// testTwitter()
+// 	mBot.AutoRetrieveXkcd(slackWebHookUrlTest)
+// }
+
+// func testHN() {
+// 	if err := mBot.AutoRetrieveHN(slackWebHookUrlTest); err != nil {
+// 		log.Fatalln(err)
+// 	}
+// }
+
+// func testTwitter() {
+// 	if err := mBot.AutoRetrieveTwitter(TweetLists, 2000, 1000, Params.TwitterBearerToken, slackWebHookUrlTest); err != nil {
+// 		log.Panic(err)
+// 	}
+// }

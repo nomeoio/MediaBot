@@ -3,6 +3,7 @@ package mediabot
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	urlUtils "net/url"
 	"regexp"
 	"sort"
@@ -111,6 +112,8 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 		return
 	}
 
+	log.Println(len(newIdsList), "new ids retrieved.")
+
 	// turn newIdsList into batches because it's too long multi-threading
 	var storiesLen int = len(newIdsList)
 	var newIdsListBatches [][]string
@@ -132,7 +135,7 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 		for _, item = range batchItemsList {
 			if item.Score >= leastScore { // only deal with qualified items
 				var newId string = fmt.Sprint(item.Id)
-				var returnedItem SavedItem = db.QueryRow(newId) // check if exists
+				var returnedItem SavedItem = DB.QueryRow(newId) // check if exists
 				if returnedItem.Platform == "HackerNews" {      // if exists
 					continue
 				} else {
@@ -141,9 +144,13 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 				}
 			}
 		}
+		log.Println("end of patch")
 	}
+
+	log.Println(len(qualifiedSavedItems), "qualifiedSavedItems")
+
 	if len(qualifiedSavedItems) > 0 {
-		db.InsertRows(qualifiedSavedItems)
+		DB.InsertRows(qualifiedSavedItems)
 	}
 
 	var mbs utilities.MessageBlocks
