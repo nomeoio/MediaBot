@@ -3,7 +3,6 @@ package mediabot
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	urlUtils "net/url"
 	"regexp"
 	"sort"
@@ -116,8 +115,6 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 		return
 	}
 
-	log.Println(len(newIdsList), "new ids retrieved.")
-
 	// turn newIdsList into batches because it's too long multi-threading
 	var storiesLen int = len(newIdsList)
 	var newIdsListBatches [][]string
@@ -148,10 +145,7 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 				}
 			}
 		}
-		log.Println("end of patch")
 	}
-
-	log.Println(len(qualifiedSavedItems), "qualifiedSavedItems")
 
 	if len(qualifiedSavedItems) > 0 {
 		DB.InsertRows(qualifiedSavedItems)
@@ -281,7 +275,6 @@ func (hn HNClient) getStoriesItems(newIdsList []string) (storiesItemsList []HNIt
 
 	// start := time.Now()
 	defer func() { // turn m sync.Map into storiesItemsList after the process is done
-		// log.Println("Execution Time: ", time.Since(start))
 		var id string
 		for _, id = range newIdsList {
 			var item HNItem

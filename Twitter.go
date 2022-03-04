@@ -64,7 +64,6 @@ func (tc TwitterClient) LookUpTwitterUsers(ids []string, idType string, twitterB
 }
 
 func (tc TwitterClient) SendHttpRequest(url, version, twitterBearerToken string) (body []byte, err error) {
-	log.Println("url:", url)
 	if version == "v1" {
 		body = tc.oauth1Request(url)
 	} else if version == "v2" {
@@ -128,7 +127,6 @@ func (tc TwitterClient) RetrieveTweets(listId, twitterBearerToken string, leastR
 	if listTweets, err = tc.GetListContent(listId, twitterBearerToken); err != nil {
 		return
 	}
-	log.Println("retrieved", len(listTweets), "tweets.")
 
 	// check if tweets are qualified
 	var listTweet Tweet

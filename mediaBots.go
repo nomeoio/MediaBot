@@ -15,19 +15,20 @@ var SC = utilities.SlackClient{
 type MediaBot struct{}
 
 func (mBot MediaBot) AutoRetrieveHN(slackWebHookUrlHN string) (err error) {
+	var totalNews int = 0
 	for _, s := range []string{"top", "new", "best"} {
-		log.Printf("retrieving %s hacker news.", s)
 		var mbss []utilities.MessageBlocks
 		if mbss, err = hn.RetrieveNew(s, 200); err != nil {
 			return
 		}
-		log.Printf("retrievd %d %s hacker news.", len(mbss), s)
+		totalNews += len(mbss)
 		for _, mbs := range mbss {
 			if err = SC.SendBlocks(mbs, slackWebHookUrlHN); err != nil { // send the new and not published stories to slack #hacker-news
 				return
 			}
 		}
 	}
+	log.Println("retrieved", totalNews, "hacker news.")
 	return
 }
 
@@ -59,13 +60,11 @@ func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOrigi
 	// :leastOriginalLikes: if it's retweet, this checks the original tweet's likes
 	var totalTweets int
 	for listName, listId := range tweetList {
-		log.Println("retrieving list:", listName, "id:", listId)
 		var mbList [][]utilities.MessageBlock
 		mbList, err = tc.RetrieveTweets(listId, twitterBearerToken, leastRetweetLikes, leastOriginalLikes)
 		if err != nil {
 			return
 		}
-		log.Println("mbList length:", len(mbList))
 		totalTweets += len(mbList)
 		var i int
 		var mb []utilities.MessageBlock
@@ -90,7 +89,9 @@ func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOrigi
 			break
 		}
 	}
-	SC.SendPlainText(fmt.Sprintf("Sent %d tweets.", totalTweets), os.Getenv("SlackWebHookUrlTest"))
+	var text string = fmt.Sprintf("Sent %d tweets.", totalTweets)
+	log.Println(text)
+	SC.SendPlainText(text, os.Getenv("SlackWebHookUrlTest"))
 	return
 }
 

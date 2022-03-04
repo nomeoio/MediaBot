@@ -43,9 +43,7 @@ func (db Database) InsertRow(item SavedItem) {
 	// item := SavedItem{Id: newId, Platform: "HackerNews"}
 	var result *gorm.DB = db.gormDB.Create(&item)
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Println("result:", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
@@ -55,9 +53,7 @@ func (db Database) InsertRows(items []SavedItem) {
 	// item := SavedItem{Id: newId, Platform: "HackerNews"}
 	var result *gorm.DB = db.gormDB.Create(&items)
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Println("result:", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
@@ -67,9 +63,7 @@ func (db Database) QueryRow(id string) (item SavedItem) {
 	item = SavedItem{}
 	var result *gorm.DB = db.gormDB.First(&item, "Id = ?", id)
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Println("result:", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
@@ -85,9 +79,7 @@ func (db Database) ReturnAllRecords(platform string) (savedItems []SavedItem) {
 		result = db.gormDB.Where("platform = ?", platform).Find(&savedItems)
 	}
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Printf("result: %+v\n", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
@@ -104,9 +96,7 @@ func (db Database) UpdateXkcd() (item SavedItem) {
 	item = SavedItem{}
 	var result *gorm.DB = db.gormDB.First(&item, "Platform = ?", "xkcd")
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Printf("result: %+v\n", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
@@ -128,9 +118,7 @@ func (db Database) UpdateRow(targetId, newPlatform string) (item SavedItem) {
 	item = SavedItem{}
 	var result *gorm.DB = db.gormDB.First(&item, "Id = ?", targetId)
 	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			log.Printf("result: %+v\n", result.Error)
-		} else {
+		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
 		}
 	}
