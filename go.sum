@@ -16,8 +16,6 @@ github.com/klauspost/compress v1.14.1/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47e
 github.com/mattn/go-sqlite3 v1.14.9/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
 github.com/mattn/go-sqlite3 v1.14.12 h1:TJ1bhYJPV44phC+IMu1u2K/i5RriLTPe+yc68XDJ1Z0=
 github.com/mattn/go-sqlite3 v1.14.12/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
-github.com/naughtymonsta/utilities v0.0.0-20220303134049-a03327417cb6 h1:NEFd0Nr/GgzO2LRkr9F40Qf/SkVpl5AzneMqzYLIFxg=
-github.com/naughtymonsta/utilities v0.0.0-20220303134049-a03327417cb6/go.mod h1:H1Hw3TDQ5aZIC/ettshC1YpAQM5JZ2iipGStQhBIQNA=
 github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62 h1:7MjCrkWXCXUES5kgaukr471U8romgt8KGIIqc3j9DO8=
 github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62/go.mod h1:H1Hw3TDQ5aZIC/ettshC1YpAQM5JZ2iipGStQhBIQNA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
