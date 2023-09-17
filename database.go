@@ -1,16 +1,35 @@
 package mediabot
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"path/filepath"
+	"runtime"
 	"strconv"
 
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
 // const (
 // 	sqliteFile string = "file:./data/ids.db"
 // )
+
+func init() {
+	var CurrentWorkingDir string
+	var err error
+	var envAbs string
+	CurrentWorkingDir, _ = AbsCwd()
+	if envAbs, err = filepath.Abs(filepath.Join(CurrentWorkingDir, ".env")); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err = godotenv.Load(envAbs); err != nil {
+		log.Fatalln("Error loading .env file: ", err)
+	}
+
+}
 
 type Database struct {
 	gormDB *gorm.DB
@@ -21,7 +40,7 @@ type SavedNews struct { // for saving into gorm
 	Platform string
 }
 
-func (db *Database) Init(dbDialector gorm.Dialector, dbConfig *gorm.Config) {
+func (db *Database) Init(slackWebHookUrlHN string, dbDialector gorm.Dialector, dbConfig *gorm.Config) {
 	// Init("file:./data/ids.db")
 	// var err error
 	// if db.gormDB, err = gorm.Open(sqlite.Open(sqliteFile), &gorm.Config{
@@ -43,6 +62,8 @@ func (db *Database) Init(dbDialector gorm.Dialector, dbConfig *gorm.Config) {
 	if err != nil {
 		log.Panicln(err)
 	}
+	var mBot MediaBot
+	mBot.AutoRetrieveHN(slackWebHookUrlHN)
 }
 
 func (db Database) CreateTable() {
@@ -70,8 +91,7 @@ func (db Database) InsertRows(items []SavedNews) {
 }
 
 func (db Database) QueryRow(id string) (item SavedNews) {
-	item = SavedNews{}
-	var result *gorm.DB = db.gormDB.First(&item, "Id = ?", id)
+	var result *gorm.DB = db.gormDB.First(&item, "id = ?", id)
 	if result.Error != nil {
 		if result.Error.Error() != "record not found" {
 			log.Panicln(result.Error)
@@ -134,5 +154,17 @@ func (db Database) UpdateRow(targetId, newPlatform string) (item SavedNews) {
 	}
 	item.Platform = newPlatform
 	db.gormDB.Save(&item)
+	return
+}
+
+func AbsCwd() (cwd string, err error) {
+	// os.Getwd() reuturns where you're in terminal window.
+	// this func returns the directory of the executable
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		err = errors.New("unable to get the current filename")
+		return
+	}
+	cwd = filepath.Dir(filename)
 	return
 }
