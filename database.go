@@ -5,8 +5,6 @@ import (
 	"log"
 	"strconv"
 
-	"gorm.io/driver/postgres"
-
 	"gorm.io/gorm"
 )
 
@@ -23,7 +21,7 @@ type SavedItem struct { // for saving into gorm
 	Platform string
 }
 
-func (db *Database) Init(sqliteFile string) {
+func (db *Database) Init(dbDialector gorm.Dialector, dbConfig *gorm.Config) {
 	// Init("file:./data/ids.db")
 	// var err error
 	// if db.gormDB, err = gorm.Open(sqlite.Open(sqliteFile), &gorm.Config{
@@ -33,12 +31,12 @@ func (db *Database) Init(sqliteFile string) {
 	// }
 	// db.CreateTable()
 
-	var dbDialector gorm.Dialector = postgres.New(postgres.Config{
-		DSN:                  "user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai",
-		PreferSimpleProtocol: true, // disables implicit prepared statement usage
-	})
+	// var dbDialector gorm.Dialector = postgres.New(postgres.Config{
+	// 	DSN:                  "user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai",
+	// 	PreferSimpleProtocol: true, // disables implicit prepared statement usage
+	// })
 
-	var dbConfig *gorm.Config = &gorm.Config{}
+	// var dbConfig *gorm.Config = &gorm.Config{}
 
 	var err error
 	db.gormDB, err = gorm.Open(dbDialector, dbConfig)
