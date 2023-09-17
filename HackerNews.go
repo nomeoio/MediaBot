@@ -157,7 +157,7 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 	newIdsListBatches = append(newIdsListBatches, newIdsList[storiesLen-storiesLen%100:])
 
 	var storiesItemsList []HNItem
-	var qualifiedSavedItems []SavedItem
+	var qualifiedSavedItems []SavedNews
 
 	for _, idsBatch := range newIdsListBatches {
 		var batchItemsList []HNItem
@@ -169,12 +169,12 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 		for _, item = range batchItemsList {
 			if item.Score >= leastScore { // only deal with qualified items
 				var newId string = fmt.Sprint(item.Id)
-				var returnedItem SavedItem = DB.QueryRow(newId) // check if exists
+				var returnedItem SavedNews = DB.QueryRow(newId) // check if exists
 				if returnedItem.Platform == "HackerNews" {      // if exists
 					continue
 				} else {
 					storiesItemsList = append(storiesItemsList, item)
-					qualifiedSavedItems = append(qualifiedSavedItems, SavedItem{Id: newId, Platform: "HackerNews"})
+					qualifiedSavedItems = append(qualifiedSavedItems, SavedNews{Id: newId, Platform: "HackerNews"})
 				}
 			}
 		}

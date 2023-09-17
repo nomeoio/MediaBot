@@ -6,13 +6,13 @@ import (
 
 func TestUpdateXkcd(t *testing.T) {
 	for i := 0; i < 3; i++ {
-		var item SavedItem = DB.UpdateXkcd()
+		var item SavedNews = DB.UpdateXkcd()
 		t.Logf("item: %+v\n", item)
 	}
 }
 
 func TestReturnAllRecords(t *testing.T) {
-	var items []SavedItem = DB.ReturnAllRecords("xkcd")
+	var items []SavedNews = DB.ReturnAllRecords("xkcd")
 	for _, item := range items {
 		t.Logf("item: %+v\n", item)
 	}

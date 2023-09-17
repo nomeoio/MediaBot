@@ -130,7 +130,7 @@ func (tc TwitterClient) RetrieveTweets(listId, twitterBearerToken string, leastR
 
 	// check if tweets are qualified
 	var listTweet Tweet
-	var qualifiedSavedItems []SavedItem
+	var qualifiedSavedItems []SavedNews
 	for _, listTweet = range listTweets {
 		var retweet *Tweet = listTweet.Retweeted_Status
 		var quoted *Tweet = listTweet.Quoted_Status
@@ -138,8 +138,8 @@ func (tc TwitterClient) RetrieveTweets(listId, twitterBearerToken string, leastR
 			if DB.QueryRow(listTweet.Id_Str).Platform == "Twitter" { // if exists
 				continue
 			} else {
-				qualifiedSavedItems = append(qualifiedSavedItems, SavedItem{Id: listTweet.Id_Str, Platform: "Twitter"})
-				// db.InsertRow(SavedItem{Id: listTweet.Id_Str, Platform: "Twitter"})
+				qualifiedSavedItems = append(qualifiedSavedItems, SavedNews{Id: listTweet.Id_Str, Platform: "Twitter"})
+				// db.InsertRow(SavedNews{Id: listTweet.Id_Str, Platform: "Twitter"})
 				qualifiedListTweets = append(qualifiedListTweets, listTweet)
 			}
 		}

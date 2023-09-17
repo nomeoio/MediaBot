@@ -32,8 +32,8 @@ func StartAll(slackWebHookUrlHN, slackWebHookUrlTwitter, slackWebHookUrlCartoons
 
 // func TestAll(t *testing.T) {
 // 	DB.Init("file:./data/ids.db") // creates db file or table if doesn't exist, doesn't do anything if exists.
-// 	// var savedItems []SavedItem = DB.ReturnAllRecords("HackerNews")
-// 	// var savedItems []SavedItem = DB.ReturnAllRecords("Twitter")
+// 	// var savedItems []SavedNews = DB.ReturnAllRecords("HackerNews")
+// 	// var savedItems []SavedNews = DB.ReturnAllRecords("Twitter")
 // 	// t.Log(savedItems)
 // 	// for _, savedItem := range savedItems {
 // 	// 	t.Log(savedItem)

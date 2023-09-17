@@ -96,7 +96,7 @@ func (mBot MediaBot) AutoRetrieveTwitter(tweetList map[string]string, leastOrigi
 }
 
 func (mBot MediaBot) AutoRetrieveXkcd(slackWebHookUrlCartoons string) (err error) {
-	var item SavedItem = DB.UpdateXkcd()
+	var item SavedNews = DB.UpdateXkcd()
 	var mbs utilities.MessageBlocks
 	mbs, err = xk.GetStoryById(item.Id)
 	if err != nil {
