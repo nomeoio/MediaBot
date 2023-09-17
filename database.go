@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -16,20 +15,20 @@ import (
 // 	sqliteFile string = "file:./data/ids.db"
 // )
 
-func init() {
-	var CurrentWorkingDir string
-	var err error
-	var envAbs string
-	CurrentWorkingDir, _ = AbsCwd()
-	if envAbs, err = filepath.Abs(filepath.Join(CurrentWorkingDir, ".env")); err != nil {
-		log.Fatalln(err)
-	}
+// func init() {
+// 	var CurrentWorkingDir string
+// 	var err error
+// 	var envAbs string
+// 	CurrentWorkingDir, _ = AbsCwd()
+// 	if envAbs, err = filepath.Abs(filepath.Join(CurrentWorkingDir, ".env")); err != nil {
+// 		log.Fatalln(err)
+// 	}
 
-	if err = godotenv.Load(envAbs); err != nil {
-		log.Fatalln("Error loading .env file: ", err)
-	}
+// 	if err = godotenv.Load(envAbs); err != nil {
+// 		log.Fatalln("Error loading .env file: ", err)
+// 	}
 
-}
+// }
 
 type Database struct {
 	gormDB *gorm.DB
