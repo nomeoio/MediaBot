@@ -7,15 +7,7 @@ import (
 
 var mBot MediaBot
 
-var TweetLists = map[string]string{
-	"Makers":        "1229215345526722560",
-	"Entrepreneurs": "1229216130662723584",
-	"Greats":        "1310225357019074562",
-	"Investors":     "1237393320378118149",
-	"Physicists":    "1394817230630572034",
-	"YouTubers":     "1229243949950201856",
-	"Writters":      "1286864227475447808",
-}
+var TweetLists = map[string]string{}
 
 func StartAll(slackWebHookUrlHN, slackWebHookUrlTwitter, slackWebHookUrlCartoons, slackWebHookUrlHNClassics, logUrl string) {
 	if !IsTestMode { // if this is not in test mode

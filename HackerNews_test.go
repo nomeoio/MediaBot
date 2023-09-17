@@ -5,10 +5,17 @@ import (
 	"time"
 )
 
-// func TestParams(t *testing.T) {
-// 	_ = json.Unmarshal(utilities.ReadFile(paramsFilename), &Params)
-// 	t.Log(Params)
-// }
+func TestRetrieve(t *testing.T) {
+	var storiesItemsList []HNItem
+	var err error
+	if storiesItemsList, err = hn.Retrieve("top", 200); err != nil {
+		panic(err)
+	}
+	for i, story := range storiesItemsList {
+		t.Log("i:", i)
+		t.Logf("story: %+v\n", story)
+	}
+}
 
 func TestAlgolia(t *testing.T) {
 	// var url string = "https://hn.algolia.com/api/v1/search?query=github"

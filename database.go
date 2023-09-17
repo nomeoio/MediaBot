@@ -5,10 +5,9 @@ import (
 	"log"
 	"strconv"
 
-	_ "github.com/mattn/go-sqlite3"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
+
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 // const (
@@ -26,17 +25,30 @@ type SavedItem struct { // for saving into gorm
 
 func (db *Database) Init(sqliteFile string) {
 	// Init("file:./data/ids.db")
+	// var err error
+	// if db.gormDB, err = gorm.Open(sqlite.Open(sqliteFile), &gorm.Config{
+	// 	Logger: logger.Default.LogMode(logger.Silent),
+	// }); err != nil {
+	// 	log.Panicln(err)
+	// }
+	// db.CreateTable()
+
+	var dbDialector gorm.Dialector = postgres.New(postgres.Config{
+		DSN:                  "user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai",
+		PreferSimpleProtocol: true, // disables implicit prepared statement usage
+	})
+
+	var dbConfig *gorm.Config = &gorm.Config{}
+
 	var err error
-	if db.gormDB, err = gorm.Open(sqlite.Open(sqliteFile), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	}); err != nil {
+	db.gormDB, err = gorm.Open(dbDialector, dbConfig)
+	if err != nil {
 		log.Panicln(err)
 	}
-	db.CreateTable()
 }
 
 func (db Database) CreateTable() {
-	db.gormDB.AutoMigrate(&SavedItem{})
+	// db.gormDB.AutoMigrate(&SavedItem{})
 }
 
 func (db Database) InsertRow(item SavedItem) {

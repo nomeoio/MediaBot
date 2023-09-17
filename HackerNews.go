@@ -109,6 +109,39 @@ func (hn HNClient) ClassicsFormatData(results HNAlgoliaSearchResults) (mrkdwnLis
 	return
 }
 
+func (hn HNClient) Retrieve(autoHNPostType string, leastScore int) (storiesItemsList []HNItem, err error) {
+	var newIdsList []string
+	if newIdsList, err = hn.getStoriesIds(autoHNPostType); err != nil { // get 500 newest ids
+		return
+	}
+
+	// turn newIdsList into batches because it's too long multi-threading
+	var storiesLen int = len(newIdsList)
+	var newIdsListBatches [][]string
+	for i := 0; i < storiesLen/100; i++ { // turn newIdsList into batches
+		newIdsListBatches = append(newIdsListBatches, newIdsList[i*100:(i+1)*100])
+	}
+	newIdsListBatches = append(newIdsListBatches, newIdsList[storiesLen-storiesLen%100:])
+
+	storiesItemsList = []HNItem{}
+
+	for _, idsBatch := range newIdsListBatches {
+		var batchItemsList []HNItem
+		if batchItemsList, err = hn.getStoriesItems(idsBatch); err != nil { // get items of this batch base on batch ids
+			return
+		}
+
+		var item HNItem
+		for _, item = range batchItemsList {
+			if item.Score >= leastScore { // only deal with qualified items
+				storiesItemsList = append(storiesItemsList, item)
+			}
+		}
+	}
+
+	return
+}
+
 func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []utilities.MessageBlocks, err error) {
 	var newIdsList []string
 	if newIdsList, err = hn.getStoriesIds(autoHNPostType); err != nil { // get 500 newest ids
