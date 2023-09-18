@@ -61,8 +61,6 @@ func (db *Database) Init(slackWebHookUrlHN string, dbDialector gorm.Dialector, d
 	if err != nil {
 		log.Panicln(err)
 	}
-	var mBot MediaBot
-	mBot.AutoRetrieveHN(slackWebHookUrlHN)
 }
 
 func (db Database) CreateTable() {
