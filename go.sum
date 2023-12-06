@@ -29,8 +29,10 @@ github.com/kr/pretty v0.3.0/go.mod h1:640gp4NfQd8pI5XOwp5fnNeVWj67G7CFk/SaSQn7NB
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
-github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62 h1:7MjCrkWXCXUES5kgaukr471U8romgt8KGIIqc3j9DO8=
-github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62/go.mod h1:H1Hw3TDQ5aZIC/ettshC1YpAQM5JZ2iipGStQhBIQNA=
+github.com/naughtymonsta/utilities v0.0.0-20231206063727-2d9cf11dc21c h1:i0ZZV9stCRuxN1hxTE/Zh2lkvkotbucDPDXUTcUPs6I=
+github.com/naughtymonsta/utilities v0.0.0-20231206063727-2d9cf11dc21c/go.mod h1:qznyUTjEHrSjG4hpvybd+VDbApNvaiUeG5hW1F32TPA=
+github.com/naughtymonsta/utilities v0.0.0-20231206071328-4167758a1745 h1:qAEsE0t2Ah37h35mcoP3uCX2+jEhCYtcxCtHAtU93i0=
+github.com/naughtymonsta/utilities v0.0.0-20231206071328-4167758a1745/go.mod h1:qznyUTjEHrSjG4hpvybd+VDbApNvaiUeG5hW1F32TPA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=

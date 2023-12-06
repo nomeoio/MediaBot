@@ -6,7 +6,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/gofiber/fiber/v2 v2.28.0
 	github.com/joho/godotenv v1.5.1
-	github.com/naughtymonsta/utilities v0.0.0-20220304092443-f52a6e5deb62
+	github.com/naughtymonsta/utilities v0.0.0-20231206071328-4167758a1745
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.0
 )

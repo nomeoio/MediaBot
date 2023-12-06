@@ -35,27 +35,12 @@ type Database struct {
 }
 
 type SavedNews struct { // for saving into gorm
-	Id       string
-	Platform string
+	Id       string `json:"id"`
+	Platform string `json:"platform"`
+	Scores   int    `json:"scores"`
 }
 
 func (db *Database) Init(slackWebHookUrlHN string, dbDialector gorm.Dialector, dbConfig *gorm.Config) {
-	// Init("file:./data/ids.db")
-	// var err error
-	// if db.gormDB, err = gorm.Open(sqlite.Open(sqliteFile), &gorm.Config{
-	// 	Logger: logger.Default.LogMode(logger.Silent),
-	// }); err != nil {
-	// 	log.Panicln(err)
-	// }
-	// db.CreateTable()
-
-	// var dbDialector gorm.Dialector = postgres.New(postgres.Config{
-	// 	DSN:                  "user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai",
-	// 	PreferSimpleProtocol: true, // disables implicit prepared statement usage
-	// })
-
-	// var dbConfig *gorm.Config = &gorm.Config{}
-
 	var err error
 	db.gormDB, err = gorm.Open(dbDialector, dbConfig)
 	if err != nil {
@@ -95,6 +80,10 @@ func (db Database) QueryRow(id string) (item SavedNews) {
 		}
 	}
 	return
+}
+
+func (db Database) QueryRows(ids []string, items *[]SavedNews) (result *gorm.DB) {
+	return db.gormDB.Raw("SELECT * FROM saved_news WHERE id IN (?)", ids).Scan(items)
 }
 
 func (db Database) ReturnAllRecords(platform string) (savedItems []SavedNews) {

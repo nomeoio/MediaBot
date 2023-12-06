@@ -142,7 +142,7 @@ func (hn HNClient) Retrieve(autoHNPostType string, leastScore int) (storiesItems
 	return
 }
 
-func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []utilities.MessageBlocks, err error) {
+func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore, mostScore int) (storiesItemsList []HNItem, err error) {
 	var newIdsList []string
 	if newIdsList, err = hn.getStoriesIds(autoHNPostType); err != nil { // get 500 newest ids
 		return
@@ -156,40 +156,38 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore int) (mbss []ut
 	}
 	newIdsListBatches = append(newIdsListBatches, newIdsList[storiesLen-storiesLen%100:])
 
-	var storiesItemsList []HNItem
 	var qualifiedSavedItems []SavedNews
 
+	var existingHNItems []SavedNews
+	DB.QueryRows(newIdsList, &existingHNItems)
+	var newHNItems = []HNItem{}
 	for _, idsBatch := range newIdsListBatches {
 		var batchItemsList []HNItem
 		if batchItemsList, err = hn.getStoriesItems(idsBatch); err != nil { // get items of this batch base on batch ids
 			return
 		}
+		newHNItems = append(newHNItems, batchItemsList...)
+	}
 
-		var item HNItem
-		for _, item = range batchItemsList {
-			if item.Score >= leastScore { // only deal with qualified items
-				var newId string = fmt.Sprint(item.Id)
-				var returnedItem SavedNews = DB.QueryRow(newId) // check if exists
-				if returnedItem.Platform == "HackerNews" {      // if exists
-					continue
-				} else {
-					storiesItemsList = append(storiesItemsList, item)
-					qualifiedSavedItems = append(qualifiedSavedItems, SavedNews{Id: newId, Platform: "HackerNews"})
+	for _, item := range newHNItems {
+		if item.Score >= leastScore && item.Score <= mostScore { // only deal with qualified items
+			var newId string = fmt.Sprint(item.Id)
+			var exists bool = false
+			for _, existingHNItem := range existingHNItems {
+				if existingHNItem.Id == newId {
+					exists = true
+					break
 				}
+			}
+			if !exists {
+				storiesItemsList = append(storiesItemsList, item)
+				qualifiedSavedItems = append(qualifiedSavedItems, SavedNews{Id: newId, Platform: "HackerNews", Scores: item.Score})
 			}
 		}
 	}
 
-	if len(qualifiedSavedItems) > 0 {
+	if len(qualifiedSavedItems) > 0 && !IsLaptop {
 		DB.InsertRows(qualifiedSavedItems)
-	}
-
-	var mbs utilities.MessageBlocks
-	for foundNum := 0; foundNum < len(storiesItemsList); foundNum++ {
-		if mbs, err = hn.formatData("", storiesItemsList[foundNum:foundNum+1], true); err != nil {
-			return
-		}
-		mbss = append(mbss, mbs)
 	}
 	return
 }

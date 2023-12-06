@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/naughtymonsta/utilities"
 )
@@ -14,21 +15,63 @@ var SC = utilities.SlackClient{
 
 type MediaBot struct{}
 
-func (mBot MediaBot) AutoRetrieveHN(slackWebHookUrlHN string) (err error) {
+var TG utilities.Telegram
+
+func (mBot MediaBot) AutoRetrieveHN(slackHN100, slackHN200, telegramChatID string) (err error) {
 	var totalNews int = 0
 	for _, s := range []string{"top", "new", "best"} {
-		var mbss []utilities.MessageBlocks
-		if mbss, err = hn.RetrieveNew(s, 200); err != nil {
+		var storiesItemsList []HNItem
+		if storiesItemsList, err = hn.RetrieveNew(s, 100, 10000); err != nil {
 			return
 		}
-		totalNews += len(mbss)
-		for _, mbs := range mbss {
-			if err = SC.SendBlocks(mbs, slackWebHookUrlHN); err != nil { // send the new and not published stories to slack #hacker-news
-				return
+		var mbs utilities.MessageBlocks
+		for i, story := range storiesItemsList {
+			if mbs, err = hn.formatData("", storiesItemsList[i:i+1], true); err != nil {
+				continue
 			}
+
+			if story.Score >= 100 && story.Score < 200 {
+				if slackHN100 != "" {
+					SC.SendBlocks(mbs, slackHN100)
+				}
+			} else if story.Score >= 200 {
+				if slackHN200 != "" {
+					SC.SendBlocks(mbs, slackHN200)
+				}
+			}
+
+			if telegramChatID != "" {
+				var text string
+				if text, err = formatTelegramMessage(story); err != nil {
+					continue
+				}
+				if story.Score >= 100 && story.Score < 200 {
+					TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, telegramChatID, "4")
+				} else if story.Score >= 200 {
+					TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, telegramChatID, "3")
+				}
+			}
+			totalNews++
 		}
 	}
-	log.Println("retrieved", totalNews, "hacker news.")
+	// log.Println("retrieved", totalNews, "hacker news.")
+	return
+}
+
+func formatTelegramMessage(story HNItem) (text string, err error) {
+	var timestamp string
+	if timestamp, err = utilities.ConvertUnixTime(story.Time, Params.Timezone, time.DateTime); err != nil {
+		return
+	}
+	text = fmt.Sprintf(`*%s*
+Link: %s
+Score: *%d*, Comments: *%d*
+HN: %s
+@%s
+_%s_`,
+		story.Title, story.Url, story.Score, len(story.Kids),
+		fmt.Sprintf(hn.PageUrlTmplt, story.Id), hn.parseHostname(story.Url), timestamp,
+	)
 	return
 }
 
