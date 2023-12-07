@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // const (
@@ -52,24 +53,15 @@ func (db Database) CreateTable() {
 	// db.gormDB.AutoMigrate(&SavedNews{})
 }
 
-func (db Database) InsertRow(item SavedNews) {
-	// item := SavedNews{Id: newId, Platform: "HackerNews"}
-	var result *gorm.DB = db.gormDB.Create(&item)
-	if result.Error != nil {
-		if result.Error.Error() != "record not found" {
-			log.Panicln(result.Error)
-		}
-	}
+func (db Database) InsertRow(item SavedNews) (result *gorm.DB) {
+	return db.gormDB.Create(&item)
 }
 
-func (db Database) InsertRows(items []SavedNews) {
-	// item := SavedNews{Id: newId, Platform: "HackerNews"}
-	var result *gorm.DB = db.gormDB.Create(&items)
-	if result.Error != nil {
-		if result.Error.Error() != "record not found" {
-			log.Panicln(result.Error)
-		}
-	}
+func (db Database) InsertRows(items []SavedNews) (result *gorm.DB) {
+	return db.gormDB.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"scores"}),
+	}).Create(&items)
 }
 
 func (db Database) QueryRow(id string) (item SavedNews) {
