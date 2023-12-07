@@ -175,8 +175,13 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore, mostScore int)
 			var exists bool = false
 			for _, existingHNItem := range existingHNItems {
 				if existingHNItem.Id == newId {
-					exists = true
-					break
+					if item.Score > existingHNItem.Scores {
+						go DB.UpdateSavedNewsRow(newId, item.Score)
+					}
+					if !(existingHNItem.Scores < 200 && item.Score >= 200) {
+						exists = true
+						break
+					}
 				}
 			}
 			if !exists {

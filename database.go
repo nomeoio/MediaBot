@@ -86,6 +86,10 @@ func (db Database) QueryRows(ids []string, items *[]SavedNews) (result *gorm.DB)
 	return db.gormDB.Raw("SELECT * FROM saved_news WHERE id IN (?)", ids).Scan(items)
 }
 
+func (db Database) UpdateSavedNewsRow(id string, score int) (result *gorm.DB) {
+	return db.gormDB.Exec("UPDATE saved_news SET scores = ? WHERE id = ?", score, id)
+}
+
 func (db Database) ReturnAllRecords(platform string) (savedItems []SavedNews) {
 	savedItems = []SavedNews{}
 	var result *gorm.DB

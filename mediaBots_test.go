@@ -71,6 +71,10 @@ func TestFormatTG(t *testing.T) {
 // 	mBot.AutoRetrieveHN("", "-1002072292994")
 // }
 
+func TestRetrieveNew(t *testing.T) {
+	hn.RetrieveNew("new", 100, 10000)
+}
+
 func TestQueryRows(t *testing.T) {
 	var items = []SavedNews{}
 	DB.QueryRows([]string{
