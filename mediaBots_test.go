@@ -101,5 +101,5 @@ func init() {
 			},
 		)}
 
-	DB.Init("", dbDialector, dbConfig) // creates db file or table if doesn't exist, doesn't do anything if exists.
+	DB.Init(dbDialector, dbConfig) // creates db file or table if doesn't exist, doesn't do anything if exists.
 }

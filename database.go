@@ -41,7 +41,7 @@ type SavedNews struct { // for saving into gorm
 	Scores   int    `json:"scores"`
 }
 
-func (db *Database) Init(slackWebHookUrlHN string, dbDialector gorm.Dialector, dbConfig *gorm.Config) {
+func (db *Database) Init(dbDialector gorm.Dialector, dbConfig *gorm.Config) {
 	var err error
 	db.gormDB, err = gorm.Open(dbDialector, dbConfig)
 	if err != nil {

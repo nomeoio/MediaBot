@@ -178,7 +178,7 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore, mostScore int)
 					if item.Score > existingHNItem.Scores {
 						go DB.UpdateSavedNewsRow(newId, item.Score)
 					}
-					if !(existingHNItem.Scores < 200 && item.Score >= 200) {
+					if !(existingHNItem.Scores < 200 && item.Score >= 200) || (existingHNItem.Scores < 200 && item.Score < 200) {
 						exists = true
 						break
 					}
