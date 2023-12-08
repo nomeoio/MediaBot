@@ -173,25 +173,27 @@ func (hn HNClient) RetrieveNew(autoHNPostType string, leastScore, mostScore int)
 		if item.Score >= leastScore && item.Score <= mostScore { // only deal with qualified items
 			var newId string = fmt.Sprint(item.Id)
 			var exists bool = false
+			var upgraded bool = false
 			for _, existingHNItem := range existingHNItems {
 				if existingHNItem.Id == newId {
+					exists = true
 					if item.Score > existingHNItem.Scores {
 						go DB.UpdateSavedNewsRow(newId, item.Score)
 					}
-					if !(existingHNItem.Scores < 200 && item.Score >= 200) || (existingHNItem.Scores < 200 && item.Score < 200) {
-						exists = true
-						break
+					if existingHNItem.Scores < 200 && item.Score >= 200 {
+						upgraded = true
 					}
+					break
 				}
 			}
-			if !exists {
+			if !exists || upgraded {
 				storiesItemsList = append(storiesItemsList, item)
 				qualifiedSavedItems = append(qualifiedSavedItems, SavedNews{Id: newId, Platform: "HackerNews", Scores: item.Score})
 			}
 		}
 	}
 
-	if len(qualifiedSavedItems) > 0 && !IsLaptop {
+	if len(qualifiedSavedItems) > 0 {
 		DB.InsertRows(qualifiedSavedItems)
 	}
 	return

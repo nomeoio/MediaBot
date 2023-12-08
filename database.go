@@ -59,7 +59,7 @@ func (db Database) InsertRow(item SavedNews) (result *gorm.DB) {
 
 func (db Database) InsertRows(items []SavedNews) (result *gorm.DB) {
 	return db.gormDB.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}},
+		Columns:   []clause.Column{{Name: "id"}, {Name: "platform"}},
 		DoUpdates: clause.AssignmentColumns([]string{"scores"}),
 	}).Create(&items)
 }

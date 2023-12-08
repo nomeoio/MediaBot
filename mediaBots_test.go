@@ -67,9 +67,9 @@ func TestFormatTG(t *testing.T) {
 	TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, os.Getenv("TGChannelHN"), "4")
 }
 
-// func TestAutoRetrieveHN(t *testing.T) {
-// 	mBot.AutoRetrieveHN("", "-1002072292994")
-// }
+func TestAutoRetrieveHN(t *testing.T) {
+	mBot.AutoRetrieveHN("", "", "")
+}
 
 func TestRetrieveNew(t *testing.T) {
 	hn.RetrieveNew("new", 100, 10000)
