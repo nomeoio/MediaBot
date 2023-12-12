@@ -33,6 +33,8 @@ github.com/naughtymonsta/utilities v0.0.0-20231206063727-2d9cf11dc21c h1:i0ZZV9s
 github.com/naughtymonsta/utilities v0.0.0-20231206063727-2d9cf11dc21c/go.mod h1:qznyUTjEHrSjG4hpvybd+VDbApNvaiUeG5hW1F32TPA=
 github.com/naughtymonsta/utilities v0.0.0-20231206071328-4167758a1745 h1:qAEsE0t2Ah37h35mcoP3uCX2+jEhCYtcxCtHAtU93i0=
 github.com/naughtymonsta/utilities v0.0.0-20231206071328-4167758a1745/go.mod h1:qznyUTjEHrSjG4hpvybd+VDbApNvaiUeG5hW1F32TPA=
+github.com/naughtymonsta/utilities v0.0.0-20231212084359-bb9d45136874 h1:r43f8dMoZUHPLWxEJ6fbMF1cS2qAvj+RuVRkKuXKBzs=
+github.com/naughtymonsta/utilities v0.0.0-20231212084359-bb9d45136874/go.mod h1:qznyUTjEHrSjG4hpvybd+VDbApNvaiUeG5hW1F32TPA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=

@@ -64,7 +64,8 @@ func TestFormatTG(t *testing.T) {
 	}
 	var text string
 	text, _ = formatTelegramMessage(i)
-	TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, os.Getenv("TGChannelHN"), "4")
+	// TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, os.Getenv("TGChannelHN"), "4")
+	TG.SendMessage(os.Getenv("NomieTheBotHTTPAPIToken"), text, os.Getenv("ChannelIDTestFeed"), "")
 }
 
 func TestAutoRetrieveHN(t *testing.T) {

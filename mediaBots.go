@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/naughtymonsta/utilities"
 )
@@ -60,15 +59,13 @@ func (mBot MediaBot) AutoRetrieveHN(slackHN100, slackHN200, telegramChatID strin
 
 func formatTelegramMessage(story HNItem) (text string, err error) {
 	var timestamp string
-	if timestamp, err = utilities.ConvertUnixTime(story.Time, Params.Timezone, time.DateTime); err != nil {
+	if timestamp, err = utilities.ConvertUnixTime(story.Time, Params.Timezone, "Jan 02 15:04"); err != nil {
 		return
 	}
-	text = fmt.Sprintf(`*%s*
-Link: %s
+	text = fmt.Sprintf(`[*%s*](%s)
 Score: *%d*, Comments: *%d*
-HN: %s
-@%s
-_%s_`,
+[HN Link](%s)
+@ %s _%s_`,
 		story.Title, story.Url, story.Score, len(story.Kids),
 		fmt.Sprintf(hn.PageUrlTmplt, story.Id), hn.parseHostname(story.Url), timestamp,
 	)
