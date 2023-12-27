@@ -62,7 +62,7 @@ func formatTelegramMessage(story HNItem) (text string, err error) {
 	if timestamp, err = utilities.ConvertUnixTime(story.Time, Params.Timezone, "Jan 02 15:04"); err != nil {
 		return
 	}
-	text = fmt.Sprintf(`[*%s*](%s)
+	text = fmt.Sprintf(`[%s](%s)
 Score: *%d*, Comments: *%d*
 [HN Link](%s)
 @ %s _%s_`,
